@@ -15,8 +15,6 @@ export interface AppConfig {
 	throttle: {
 		ttl: number;
 		limit: number;
-		authTtl: number;
-		authLimit: number;
 	};
 }
 
@@ -37,7 +35,5 @@ export const configuration = (): AppConfig => ({
 	throttle: {
 		ttl: parseInt(process.env.THROTTLE_TTL ?? '60', 10),
 		limit: parseInt(process.env.THROTTLE_LIMIT ?? '100', 10),
-		authTtl: parseInt(process.env.THROTTLE_AUTH_TTL ?? '60', 10),
-		authLimit: parseInt(process.env.THROTTLE_AUTH_LIMIT ?? '10', 10),
 	},
 });
