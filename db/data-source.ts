@@ -3,6 +3,8 @@ import { DataSource } from 'typeorm';
 
 loadEnv();
 
+const isCompiled = __filename.endsWith('.js');
+
 export const dataSource = new DataSource({
 	type: 'postgres',
 	host: process.env.DB_HOST ?? 'localhost',
@@ -10,8 +12,8 @@ export const dataSource = new DataSource({
 	username: process.env.DB_USERNAME ?? 'postgres',
 	password: process.env.DB_PASSWORD ?? 'postgres',
 	database: process.env.DB_NAME ?? 'todo',
-	entities: ['src/**/*.entity.ts'],
-	migrations: ['db/migrations/*.ts'],
+	entities: [isCompiled ? 'dist/**/*.entity.js' : 'src/**/*.entity.ts'],
+	migrations: [isCompiled ? 'dist/db/migrations/*.js' : 'db/migrations/*.ts'],
 	synchronize: false,
 });
 
