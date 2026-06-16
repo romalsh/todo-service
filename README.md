@@ -7,6 +7,7 @@
 - NestJS + TypeScript
 - PostgreSQL + TypeORM (миграции)
 - JWT (passport-jwt), bcrypt
+- WebSocket (Socket.IO) для real-time событий
 - Swagger, Helmet, rate limiting (throttler)
 
 ## Запуск
@@ -58,6 +59,41 @@ npm run dev                     # watch-режим
 | `DELETE` | `/api/tasks/:id`      | архивировать (soft-delete, 204)      | JWT  |
 
 Статусы задачи: `todo`, `in_progress`, `done`. Пагинация: `page` (≥1), `limit` (1–100), `order` (`ASC`/`DESC`).
+
+## Rate limiting
+
+Глобально и на auth-эндпоинтах действуют отдельные лимиты (throttler). При превышении - `429 Too Many Requests`.
+
+| Область         | Лимит        | Окно   | Переменные                                |
+| --------------- | ------------ | ------ | ----------------------------------------- |
+| Все эндпоинты   | 100 запросов | 60 сек | `THROTTLE_TTL`, `THROTTLE_LIMIT`          |
+| `/api/auth/*`   | 10 запросов  | 60 сек | `THROTTLE_AUTH_TTL`, `THROTTLE_AUTH_LIMIT` |
+
+## WebSocket
+
+Real-time уведомления через Socket.IO, namespace `/tasks`.
+
+Аутентификация в handshake - токен в `auth.token` или заголовке `Authorization: Bearer <token>`; без валидного токена соединение разрывается. Каждый клиент попадает в свою комнату и получает события только по своим задачам (server → client):
+
+| Событие        | Payload   | Триггер                  |
+| -------------- | --------- | ------------------------ |
+| `task.created` | `TaskDto` | `POST /api/tasks`        |
+| `task.updated` | `TaskDto` | `PATCH /api/tasks/:id`   |
+| `task.deleted` | `{ id }`  | `DELETE /api/tasks/:id`  |
+
+Пример подключения:
+
+```js
+import { io } from 'socket.io-client';
+
+const socket = io('http://localhost:3000/tasks', {
+  auth: { token: '<accessToken>' },
+});
+
+socket.on('task.created', (task) => console.log('created', task));
+socket.on('task.updated', (task) => console.log('updated', task));
+socket.on('task.deleted', ({ id }) => console.log('deleted', id));
+```
 
 ## Примеры curl
 

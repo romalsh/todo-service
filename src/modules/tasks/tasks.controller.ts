@@ -43,7 +43,10 @@ export class TasksController {
 	constructor(private readonly tasks: TasksService) {}
 
 	@Post()
-	@ApiOperation({ summary: 'Create a task' })
+	@ApiOperation({
+		summary: 'Create a task',
+		description: 'Emits the `task.created` WebSocket event (namespace `/tasks`) to the owner.',
+	})
 	@ApiCreatedResponse({ type: TaskDto })
 	@ApiErrorResponses(ErrorCode.VALIDATION_ERROR, ErrorCode.UNAUTHORIZED)
 	async create(
@@ -93,7 +96,10 @@ export class TasksController {
 	}
 
 	@Patch(':id')
-	@ApiOperation({ summary: 'Update an active task' })
+	@ApiOperation({
+		summary: 'Update an active task',
+		description: 'Emits the `task.updated` WebSocket event (namespace `/tasks`) to the owner.',
+	})
 	@ApiOkResponse({ type: TaskDto })
 	@ApiErrorResponses(
 		ErrorCode.VALIDATION_ERROR,
@@ -112,7 +118,10 @@ export class TasksController {
 
 	@Delete(':id')
 	@HttpCode(HttpStatus.NO_CONTENT)
-	@ApiOperation({ summary: 'Archive a task (soft-delete)' })
+	@ApiOperation({
+		summary: 'Archive a task (soft-delete)',
+		description: 'Emits the `task.deleted` WebSocket event (namespace `/tasks`) to the owner.',
+	})
 	@ApiNoContentResponse()
 	@ApiErrorResponses(
 		ErrorCode.UNAUTHORIZED,
