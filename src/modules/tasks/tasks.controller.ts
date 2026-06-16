@@ -24,10 +24,13 @@ import {
 	ApiErrorResponses,
 	ApiOkPaginated,
 	CurrentUser,
-	ErrorCode,
 	JwtAuthGuard,
 	PaginatedDto,
 	PaginationQueryDto,
+	TaskArchivedException,
+	TaskForbiddenException,
+	TaskNotFoundException,
+	UnauthorizedException,
 } from '@libs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { QueryTasksDto } from './dto/query-tasks.dto';
@@ -48,7 +51,7 @@ export class TasksController {
 		description: 'Emits the `task.created` WebSocket event (namespace `/tasks`) to the owner.',
 	})
 	@ApiCreatedResponse({ type: TaskDto })
-	@ApiErrorResponses(ErrorCode.VALIDATION_ERROR, ErrorCode.UNAUTHORIZED)
+	@ApiErrorResponses(UnauthorizedException)
 	async create(
 		@CurrentUser('id') userId: string,
 		@Body() dto: CreateTaskDto,
@@ -59,7 +62,7 @@ export class TasksController {
 	@Get()
 	@ApiOperation({ summary: 'List own active tasks with status filter and pagination' })
 	@ApiOkPaginated(TaskDto)
-	@ApiErrorResponses(ErrorCode.VALIDATION_ERROR, ErrorCode.UNAUTHORIZED)
+	@ApiErrorResponses(UnauthorizedException)
 	async findAll(
 		@CurrentUser('id') userId: string,
 		@Query() query: QueryTasksDto,
@@ -71,7 +74,7 @@ export class TasksController {
 	@Get('archived')
 	@ApiOperation({ summary: 'List own archived tasks (read-only)' })
 	@ApiOkPaginated(TaskDto)
-	@ApiErrorResponses(ErrorCode.VALIDATION_ERROR, ErrorCode.UNAUTHORIZED)
+	@ApiErrorResponses(UnauthorizedException)
 	async findArchived(
 		@CurrentUser('id') userId: string,
 		@Query() query: PaginationQueryDto,
@@ -84,9 +87,9 @@ export class TasksController {
 	@ApiOperation({ summary: 'Get one own task' })
 	@ApiOkResponse({ type: TaskDto })
 	@ApiErrorResponses(
-		ErrorCode.UNAUTHORIZED,
-		ErrorCode.FORBIDDEN,
-		ErrorCode.TASK_NOT_FOUND,
+		UnauthorizedException,
+		TaskForbiddenException,
+		TaskNotFoundException,
 	)
 	async findOne(
 		@CurrentUser('id') userId: string,
@@ -102,11 +105,10 @@ export class TasksController {
 	})
 	@ApiOkResponse({ type: TaskDto })
 	@ApiErrorResponses(
-		ErrorCode.VALIDATION_ERROR,
-		ErrorCode.UNAUTHORIZED,
-		ErrorCode.FORBIDDEN,
-		ErrorCode.TASK_NOT_FOUND,
-		ErrorCode.TASK_ARCHIVED,
+		UnauthorizedException,
+		TaskForbiddenException,
+		TaskNotFoundException,
+		TaskArchivedException,
 	)
 	async update(
 		@CurrentUser('id') userId: string,
@@ -124,9 +126,9 @@ export class TasksController {
 	})
 	@ApiNoContentResponse()
 	@ApiErrorResponses(
-		ErrorCode.UNAUTHORIZED,
-		ErrorCode.FORBIDDEN,
-		ErrorCode.TASK_NOT_FOUND,
+		UnauthorizedException,
+		TaskForbiddenException,
+		TaskNotFoundException,
 	)
 	async remove(
 		@CurrentUser('id') userId: string,

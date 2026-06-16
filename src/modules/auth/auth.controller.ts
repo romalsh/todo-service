@@ -6,7 +6,11 @@ import {
 	ApiTags,
 } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
-import { ApiErrorResponses, ErrorCode } from '@libs/common';
+import {
+	ApiErrorResponses,
+	EmailTakenException,
+	InvalidCredentialsException,
+} from '@libs/common';
 import { AuthService } from './auth.service';
 import { AuthTokenDto } from './dto/auth-token.dto';
 import { LoginDto } from './dto/login.dto';
@@ -26,7 +30,7 @@ export class AuthController {
 	@Post('register')
 	@ApiOperation({ summary: 'Register a new user and receive an access token' })
 	@ApiCreatedResponse({ type: AuthTokenDto })
-	@ApiErrorResponses(ErrorCode.VALIDATION_ERROR, ErrorCode.EMAIL_TAKEN)
+	@ApiErrorResponses(EmailTakenException)
 	register(@Body() dto: RegisterDto): Promise<AuthTokenDto> {
 		return this.auth.register(dto.email, dto.password);
 	}
@@ -35,7 +39,7 @@ export class AuthController {
 	@HttpCode(HttpStatus.OK)
 	@ApiOperation({ summary: 'Authenticate and receive an access token' })
 	@ApiOkResponse({ type: AuthTokenDto })
-	@ApiErrorResponses(ErrorCode.VALIDATION_ERROR, ErrorCode.INVALID_CREDENTIALS)
+	@ApiErrorResponses(InvalidCredentialsException)
 	login(@Body() dto: LoginDto): Promise<AuthTokenDto> {
 		return this.auth.login(dto.email, dto.password);
 	}
