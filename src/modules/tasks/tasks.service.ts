@@ -65,11 +65,15 @@ export class TasksService {
 		if (task.deletedAt) {
 			throw new TaskArchivedException();
 		}
-		Object.assign(task, {
-			title: dto.title ?? task.title,
-			description: dto.description ?? task.description,
-			status: dto.status ?? task.status,
-		});
+		if (dto.title !== undefined) {
+			task.title = dto.title;
+		}
+		if (dto.description !== undefined) {
+			task.description = dto.description ?? null;
+		}
+		if (dto.status !== undefined) {
+			task.status = dto.status;
+		}
 		const saved = await this.tasks.save(task);
 		this.gateway.emitUpdated(userId, TaskDto.from(saved));
 		return saved;
