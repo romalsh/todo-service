@@ -12,10 +12,19 @@ import {
 	Query,
 	UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import {
+	ApiBearerAuth,
+	ApiCreatedResponse,
+	ApiNoContentResponse,
+	ApiOkResponse,
+	ApiOperation,
+	ApiTags,
+} from '@nestjs/swagger';
+import {
+	ApiErrorResponses,
 	ApiOkPaginated,
 	CurrentUser,
+	ErrorCode,
 	JwtAuthGuard,
 	PaginatedDto,
 	PaginationQueryDto,
@@ -34,6 +43,9 @@ export class TasksController {
 	constructor(private readonly tasks: TasksService) {}
 
 	@Post()
+	@ApiOperation({ summary: 'Create a task' })
+	@ApiCreatedResponse({ type: TaskDto })
+	@ApiErrorResponses(ErrorCode.VALIDATION_ERROR, ErrorCode.UNAUTHORIZED)
 	async create(
 		@CurrentUser('id') userId: string,
 		@Body() dto: CreateTaskDto,
@@ -42,7 +54,9 @@ export class TasksController {
 	}
 
 	@Get()
+	@ApiOperation({ summary: 'List own active tasks with status filter and pagination' })
 	@ApiOkPaginated(TaskDto)
+	@ApiErrorResponses(ErrorCode.VALIDATION_ERROR, ErrorCode.UNAUTHORIZED)
 	async findAll(
 		@CurrentUser('id') userId: string,
 		@Query() query: QueryTasksDto,
@@ -52,7 +66,9 @@ export class TasksController {
 	}
 
 	@Get('archived')
+	@ApiOperation({ summary: 'List own archived tasks (read-only)' })
 	@ApiOkPaginated(TaskDto)
+	@ApiErrorResponses(ErrorCode.VALIDATION_ERROR, ErrorCode.UNAUTHORIZED)
 	async findArchived(
 		@CurrentUser('id') userId: string,
 		@Query() query: PaginationQueryDto,
@@ -62,6 +78,13 @@ export class TasksController {
 	}
 
 	@Get(':id')
+	@ApiOperation({ summary: 'Get one own task' })
+	@ApiOkResponse({ type: TaskDto })
+	@ApiErrorResponses(
+		ErrorCode.UNAUTHORIZED,
+		ErrorCode.FORBIDDEN,
+		ErrorCode.TASK_NOT_FOUND,
+	)
 	async findOne(
 		@CurrentUser('id') userId: string,
 		@Param('id', ParseUUIDPipe) id: string,
@@ -70,6 +93,15 @@ export class TasksController {
 	}
 
 	@Patch(':id')
+	@ApiOperation({ summary: 'Update an active task' })
+	@ApiOkResponse({ type: TaskDto })
+	@ApiErrorResponses(
+		ErrorCode.VALIDATION_ERROR,
+		ErrorCode.UNAUTHORIZED,
+		ErrorCode.FORBIDDEN,
+		ErrorCode.TASK_NOT_FOUND,
+		ErrorCode.TASK_ARCHIVED,
+	)
 	async update(
 		@CurrentUser('id') userId: string,
 		@Param('id', ParseUUIDPipe) id: string,
@@ -80,6 +112,13 @@ export class TasksController {
 
 	@Delete(':id')
 	@HttpCode(HttpStatus.NO_CONTENT)
+	@ApiOperation({ summary: 'Archive a task (soft-delete)' })
+	@ApiNoContentResponse()
+	@ApiErrorResponses(
+		ErrorCode.UNAUTHORIZED,
+		ErrorCode.FORBIDDEN,
+		ErrorCode.TASK_NOT_FOUND,
+	)
 	async remove(
 		@CurrentUser('id') userId: string,
 		@Param('id', ParseUUIDPipe) id: string,
