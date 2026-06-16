@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IsNull, Repository } from 'typeorm';
+import { FindOptionsWhere, IsNull, Repository } from 'typeorm';
 import {
+	SortOrder,
 	TaskArchivedException,
 	TaskForbiddenException,
 	TaskNotFoundException,
 } from '@libs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
+import { QueryTasksDto } from './dto/query-tasks.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { TaskEntity } from './entities/task.entity';
 
@@ -29,11 +31,12 @@ export class TasksService {
 		return this.tasks.save(task);
 	}
 
-	findActive(userId: string): Promise<TaskEntity[]> {
-		return this.tasks.find({
-			where: { userId, deletedAt: IsNull() },
-			order: { createdAt: 'DESC' },
-		});
+	findActive(userId: string, query: QueryTasksDto): Promise<[TaskEntity[], number]> {
+		const where: FindOptionsWhere<TaskEntity> = { userId, deletedAt: IsNull() };
+		if (query.status) {
+			where.status = query.status;
+		}
+		return this.paginate(where, query.page, query.limit, query.order);
 	}
 
 	async findOne(userId: string, id: string): Promise<TaskEntity> {
@@ -62,6 +65,20 @@ export class TasksService {
 		task.deletedAt = now;
 		task.purgeAt = new Date(now.getTime() + ARCHIVE_TTL_MS);
 		await this.tasks.save(task);
+	}
+
+	private paginate(
+		where: FindOptionsWhere<TaskEntity>,
+		page: number,
+		limit: number,
+		order: SortOrder,
+	): Promise<[TaskEntity[], number]> {
+		return this.tasks.findAndCount({
+			where,
+			order: { createdAt: order },
+			skip: (page - 1) * limit,
+			take: limit,
+		});
 	}
 
 	private async getOwned(userId: string, id: string): Promise<TaskEntity> {
