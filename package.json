@@ -15,7 +15,9 @@
 		"migration:show": "npm run typeorm -- migration:show",
 		"test": "jest --runInBand",
 		"test:unit": "jest --testPathPattern=\"src/|libs/\" --runInBand",
-		"test:e2e": "jest -c jest-e2e.config.js --runInBand --forceExit"
+		"test:e2e": "jest -c jest-e2e.config.js --runInBand --forceExit",
+		"format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
+		"format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\""
 	},
 	"dependencies": {
 		"@nestjs/common": "^10.4.4",
@@ -38,6 +40,7 @@
 		"passport": "^0.7.0",
 		"passport-jwt": "^4.0.1",
 		"pg": "^8.12.0",
+		"prettier": "^3.8.4",
 		"reflect-metadata": "^0.2.2",
 		"rxjs": "^7.8.1",
 		"socket.io": "^4.8.0",
