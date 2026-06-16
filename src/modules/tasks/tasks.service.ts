@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsWhere, IsNull, Repository } from 'typeorm';
+import { FindOptionsWhere, IsNull, Not, Repository } from 'typeorm';
 import {
+	PaginationQueryDto,
 	SortOrder,
 	TaskArchivedException,
 	TaskForbiddenException,
@@ -37,6 +38,17 @@ export class TasksService {
 			where.status = query.status;
 		}
 		return this.paginate(where, query.page, query.limit, query.order);
+	}
+
+	findArchived(
+		userId: string,
+		query: PaginationQueryDto,
+	): Promise<[TaskEntity[], number]> {
+		const where: FindOptionsWhere<TaskEntity> = {
+			userId,
+			deletedAt: Not(IsNull()),
+		};
+		return this.paginate(where, query.page, query.limit, SortOrder.Desc);
 	}
 
 	async findOne(userId: string, id: string): Promise<TaskEntity> {

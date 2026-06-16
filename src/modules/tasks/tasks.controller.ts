@@ -13,7 +13,13 @@ import {
 	UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { ApiOkPaginated, CurrentUser, JwtAuthGuard, PaginatedDto } from '@libs/common';
+import {
+	ApiOkPaginated,
+	CurrentUser,
+	JwtAuthGuard,
+	PaginatedDto,
+	PaginationQueryDto,
+} from '@libs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { QueryTasksDto } from './dto/query-tasks.dto';
 import { TaskDto } from './dto/task.dto';
@@ -42,6 +48,16 @@ export class TasksController {
 		@Query() query: QueryTasksDto,
 	): Promise<PaginatedDto<TaskDto>> {
 		const [items, total] = await this.tasks.findActive(userId, query);
+		return new PaginatedDto(items.map(TaskDto.from), total, query.page, query.limit);
+	}
+
+	@Get('archived')
+	@ApiOkPaginated(TaskDto)
+	async findArchived(
+		@CurrentUser('id') userId: string,
+		@Query() query: PaginationQueryDto,
+	): Promise<PaginatedDto<TaskDto>> {
+		const [items, total] = await this.tasks.findArchived(userId, query);
 		return new PaginatedDto(items.map(TaskDto.from), total, query.page, query.limit);
 	}
 
