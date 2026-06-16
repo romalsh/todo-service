@@ -28,7 +28,7 @@ services:
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
       DB_NAME: todo
-      JWT_SECRET: change-me-in-production
+      JWT_SECRET: change-me-in-production-min-32-characters-long
       JWT_EXPIRES_IN: 1h
       THROTTLE_TTL: 60
       THROTTLE_LIMIT: 100

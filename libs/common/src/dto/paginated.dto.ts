@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class PaginatedDto<T> {
+	@ApiProperty({ type: 'array', items: { type: 'object' } })
 	items!: T[];
 
 	@ApiProperty({ example: 42 })
