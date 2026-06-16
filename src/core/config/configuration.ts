@@ -29,7 +29,7 @@ export const configuration = (): AppConfig => ({
 		name: process.env.DB_NAME ?? 'todo',
 	},
 	jwt: {
-		secret: process.env.JWT_SECRET ?? 'some-secret',
+		secret: process.env.JWT_SECRET as string,
 		expiresIn: process.env.JWT_EXPIRES_IN ?? '1h',
 	},
 	throttle: {
