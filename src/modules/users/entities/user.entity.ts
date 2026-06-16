@@ -1,18 +1,9 @@
-import {
-	Column,
-	CreateDateColumn,
-	Entity,
-	OneToMany,
-	PrimaryGeneratedColumn,
-	UpdateDateColumn,
-} from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
+import { BaseEntity } from '@libs/common';
 import { TaskEntity } from '@module/tasks/entities/task.entity';
 
 @Entity({ name: 'users' })
-export class UserEntity {
-	@PrimaryGeneratedColumn('uuid')
-	id!: string;
-
+export class UserEntity extends BaseEntity {
 	@Column({ type: 'varchar', unique: true })
 	email!: string;
 
@@ -21,10 +12,4 @@ export class UserEntity {
 
 	@OneToMany(() => TaskEntity, (task) => task.user)
 	tasks!: TaskEntity[];
-
-	@CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
-	createdAt!: Date;
-
-	@UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
-	updatedAt!: Date;
 }

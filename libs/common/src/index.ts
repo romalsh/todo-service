@@ -2,6 +2,8 @@ export * from './enums/error-code.enum';
 export * from './enums/ws-event.enum';
 export * from './enums/sort-order.enum';
 
+export * from './entities/base.entity';
+
 export * from './errors/app.exception';
 
 export * from './filters/all-exceptions.filter';
