@@ -11,7 +11,6 @@ export * from './decorators/api-error-responses.decorator';
 export * from './decorators/api-paginated.decorator';
 
 export * from './guards/jwt-auth.guard';
-export * from './guards/ws-jwt.guard';
 
 export * from './dto/error-response.dto';
 export * from './dto/pagination-query.dto';
