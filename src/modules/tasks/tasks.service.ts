@@ -37,7 +37,10 @@ export class TasksService {
 		return saved;
 	}
 
-	findActive(userId: string, query: QueryTasksDto): Promise<[TaskEntity[], number]> {
+	async findActive(
+		userId: string,
+		query: QueryTasksDto,
+	): Promise<[TaskEntity[], number]> {
 		const where: FindOptionsWhere<TaskEntity> = { userId, deletedAt: IsNull() };
 		if (query.status) {
 			where.status = query.status;
@@ -45,7 +48,7 @@ export class TasksService {
 		return this.paginate(where, query.page, query.limit, query.order);
 	}
 
-	findArchived(
+	async findArchived(
 		userId: string,
 		query: PaginationQueryDto,
 	): Promise<[TaskEntity[], number]> {
