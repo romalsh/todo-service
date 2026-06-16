@@ -1,5 +1,11 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+	ApiCreatedResponse,
+	ApiOkResponse,
+	ApiOperation,
+	ApiTags,
+} from '@nestjs/swagger';
+import { ApiErrorResponses, ErrorCode } from '@libs/common';
 import { AuthService } from './auth.service';
 import { AuthTokenDto } from './dto/auth-token.dto';
 import { LoginDto } from './dto/login.dto';
@@ -11,12 +17,18 @@ export class AuthController {
 	constructor(private readonly auth: AuthService) {}
 
 	@Post('register')
+	@ApiOperation({ summary: 'Register a new user and receive an access token' })
+	@ApiCreatedResponse({ type: AuthTokenDto })
+	@ApiErrorResponses(ErrorCode.VALIDATION_ERROR, ErrorCode.EMAIL_TAKEN)
 	register(@Body() dto: RegisterDto): Promise<AuthTokenDto> {
 		return this.auth.register(dto.email, dto.password);
 	}
 
 	@Post('login')
 	@HttpCode(HttpStatus.OK)
+	@ApiOperation({ summary: 'Authenticate and receive an access token' })
+	@ApiOkResponse({ type: AuthTokenDto })
+	@ApiErrorResponses(ErrorCode.VALIDATION_ERROR, ErrorCode.INVALID_CREDENTIALS)
 	login(@Body() dto: LoginDto): Promise<AuthTokenDto> {
 		return this.auth.login(dto.email, dto.password);
 	}
