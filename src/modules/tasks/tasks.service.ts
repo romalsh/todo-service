@@ -10,8 +10,10 @@ import {
 } from '@libs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { QueryTasksDto } from './dto/query-tasks.dto';
+import { TaskDto } from './dto/task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { TaskEntity } from './entities/task.entity';
+import { TasksGateway } from './tasks.gateway';
 
 const ARCHIVE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -20,6 +22,7 @@ export class TasksService {
 	constructor(
 		@InjectRepository(TaskEntity)
 		private readonly tasks: Repository<TaskEntity>,
+		private readonly gateway: TasksGateway,
 	) {}
 
 	async create(userId: string, dto: CreateTaskDto): Promise<TaskEntity> {
@@ -29,7 +32,9 @@ export class TasksService {
 			description: dto.description ?? null,
 			status: dto.status,
 		});
-		return this.tasks.save(task);
+		const saved = await this.tasks.save(task);
+		this.gateway.emitCreated(userId, TaskDto.from(saved));
+		return saved;
 	}
 
 	findActive(userId: string, query: QueryTasksDto): Promise<[TaskEntity[], number]> {
@@ -65,7 +70,9 @@ export class TasksService {
 			description: dto.description ?? task.description,
 			status: dto.status ?? task.status,
 		});
-		return this.tasks.save(task);
+		const saved = await this.tasks.save(task);
+		this.gateway.emitUpdated(userId, TaskDto.from(saved));
+		return saved;
 	}
 
 	async softDelete(userId: string, id: string): Promise<void> {
@@ -77,6 +84,7 @@ export class TasksService {
 		task.deletedAt = now;
 		task.purgeAt = new Date(now.getTime() + ARCHIVE_TTL_MS);
 		await this.tasks.save(task);
+		this.gateway.emitDeleted(userId, task.id);
 	}
 
 	private paginate(
