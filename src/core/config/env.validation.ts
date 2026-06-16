@@ -39,7 +39,7 @@ class EnvironmentVariables {
 	DB_NAME!: string;
 
 	@IsString()
-	@MinLength(8)
+	@MinLength(32)
 	JWT_SECRET!: string;
 
 	@IsString()

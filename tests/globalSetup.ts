@@ -15,7 +15,7 @@ export default async function globalSetup(): Promise<void> {
 	process.env.DB_USERNAME = container.getUsername();
 	process.env.DB_PASSWORD = container.getPassword();
 	process.env.DB_NAME = container.getDatabase();
-	process.env.JWT_SECRET = 'test-secret-value';
+	process.env.JWT_SECRET = 'test-secret-value-at-least-32-characters-long';
 	process.env.JWT_EXPIRES_IN = '1h';
 	process.env.THROTTLE_TTL = '60';
 	process.env.THROTTLE_LIMIT = '100000';
