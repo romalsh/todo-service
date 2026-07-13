@@ -48,7 +48,8 @@ export class TasksController {
 	@Post()
 	@ApiOperation({
 		summary: 'Create a task',
-		description: 'Emits the `task.created` WebSocket event (namespace `/tasks`) to the owner.',
+		description:
+			'Emits the `task.created` WebSocket event (namespace `/tasks`) to the owner.',
 	})
 	@ApiCreatedResponse({ type: TaskDto })
 	@ApiErrorResponses(UnauthorizedException)
@@ -101,7 +102,8 @@ export class TasksController {
 	@Patch(':id')
 	@ApiOperation({
 		summary: 'Update an active task',
-		description: 'Emits the `task.updated` WebSocket event (namespace `/tasks`) to the owner.',
+		description:
+			'Emits the `task.updated` WebSocket event (namespace `/tasks`) to the owner.',
 	})
 	@ApiOkResponse({ type: TaskDto })
 	@ApiErrorResponses(
@@ -122,7 +124,8 @@ export class TasksController {
 	@HttpCode(HttpStatus.NO_CONTENT)
 	@ApiOperation({
 		summary: 'Archive a task (soft-delete)',
-		description: 'Emits the `task.deleted` WebSocket event (namespace `/tasks`) to the owner.',
+		description:
+			'Emits the `task.deleted` WebSocket event (namespace `/tasks`) to the owner.',
 	})
 	@ApiNoContentResponse()
 	@ApiErrorResponses(
